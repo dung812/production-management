@@ -1,15 +1,24 @@
 <ng-container *ngIf="state$ | async as state">
     <div [ngClass]="{ 'loading-area': state.isLoading }">
-        <nz-spin nzSimple *ngIf="state.isLoading"></nz-spin>
-        <nz-descriptions nzTitle="User Info" nzLayout="vertical">
+        <nz-descriptions nzTitle="User Info" nzLayout="vertical" *ngIf="!state.isLoading && !loadingButton.updateButton; else showSkeletonLoading">
             <nz-descriptions-item nzTitle="ID">{{ state.user?.id }}</nz-descriptions-item>
             <nz-descriptions-item nzTitle="Name">{{ state.user?.name }}</nz-descriptions-item>
-            <nz-descriptions-item nzTitle="UserName">{{
-                state.user?.userName
-            }}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Username">{{ state.user?.userName }}</nz-descriptions-item>
             <nz-descriptions-item nzTitle="Email">{{ state.user?.email }}</nz-descriptions-item>
             <nz-descriptions-item nzTitle="Role">{{ state.user?.roles }}</nz-descriptions-item>
         </nz-descriptions>
-
+        <ng-template #showSkeletonLoading>
+            <nz-skeleton [nzActive]="true"></nz-skeleton> `
+        </ng-template>
     </div>
+    <div *ngIf="!state.isLoading">
+        <button nz-button class="mr-2" nzType="primary" (click)="showModal()" [nzLoading]="loadingButton.updateButton">Edit</button>
+        <button nz-button nzType="primary" nzDanger (click)="deleteUser()" [nzLoading]="loadingButton.deleteButton">Delete</button>
+    </div>
+
+    <nz-modal [(nzVisible)]="isShowModal" nzTitle="Update User" (nzOnCancel)="closeModal()" (nzOnOk)="handleOk()">
+        <ng-container *nzModalContent>
+            <app-edit-user #editForm [userDetail]="state.user"></app-edit-user>
+        </ng-container>
+    </nz-modal>
 </ng-container>

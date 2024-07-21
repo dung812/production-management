@@ -11,10 +11,16 @@ export interface User {
   userName: string;
   roles: string;
   email: string;
+  createdDate: string;
+  updatedDate: string;
 }
 
 export interface UserForm {
-
+    id: string;
+    name: string;
+    userName: string;
+    roles: string;
+    email: string;
 }
 
 export interface UserPaginatedQuery {

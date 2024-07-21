@@ -14,7 +14,8 @@ import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSkeletonModule } from 'ng-zorro-antd/skeleton';
 
 const modules = [
   NzMenuModule,
@@ -30,7 +31,9 @@ const modules = [
   NzPaginationModule,
   NzIconModule,
   NzDescriptionsModule,
-  NzSpinModule
+  NzSpinModule,
+  NzModalModule,
+  NzSkeletonModule
 ];
 
 @NgModule({

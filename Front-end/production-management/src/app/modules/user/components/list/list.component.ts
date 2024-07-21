@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit } from "@angular/core";
-import { ListService } from "./services/list.service";
 import { FormControl } from "@angular/forms";
 import { debounceTime, takeUntil } from "rxjs";
 import {
     injectDestroyService,
     provideDestroyService,
 } from "src/app/shared/services/destroy-service.service";
+import { ListService } from "./services/list.service";
 
 @Component({
     selector: "app-list",

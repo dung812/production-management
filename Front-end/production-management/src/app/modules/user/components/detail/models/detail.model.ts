@@ -6,13 +6,7 @@ export interface SimplifiedUser {
   roles: string;
 };
 
-export interface UserDetailRes {
-  id: string;
+export interface UpdatedUserForm {
   name: string;
-  userName: string;
-  roles: string;
-  isDisabled: boolean;
   email: string;
-  createdDate: string;
-  updatedDate: string;
-}
+};

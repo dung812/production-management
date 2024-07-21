@@ -1,47 +1,51 @@
 import { Injectable } from "@angular/core";
-import { ActivatedRoute, Params, Router } from "@angular/router";
-import { Observable, ReplaySubject, map, pluck, startWith } from "rxjs";
-import { SimplifiedCurrentUser } from "src/app/models/user.model";
-import { SimplifiedUser } from "../models/detail.model";
+import { ActivatedRoute, Router } from "@angular/router";
+import { Operation } from "rfc6902";
+import { BehaviorSubject, Observable } from "rxjs";
 import { UserAPI } from "src/app/apis/user.api";
+import { SimplifiedUser } from "../models/detail.model";
 
-interface DetailsState {
+interface DetailState {
   user: SimplifiedUser | never | null;
   isLoading: boolean;
 }
 
 @Injectable()
 export class DetailsService {
-  state$: Observable<DetailsState>;
-  private detailsSubject = new ReplaySubject<DetailsState>(1);
-
-  id = '';
+  state$: Observable<DetailState>;
+  private detailsSubject = new BehaviorSubject<DetailState>({
+    user: null,
+    isLoading: false
+  });
 
   constructor(
     private route: ActivatedRoute,
     private userApi: UserAPI,
     private router: Router
   ) {
-    this.state$ = this.detailsSubject
-      .asObservable()
-      .pipe(startWith({
-        user: null,
-        isLoading: false
-      }));
+    this.state$ = this.detailsSubject.asObservable();
+  }
 
-    this.route.params.pipe(
-      map(x => x?.['id'])
-      ).subscribe((id : string) => {
-      this.id = id;
-      this.getPokemonDetails(id);
+  setState(updatedState: DetailState): void {
+    this.detailsSubject.next(updatedState); 
+  }
+  getState(): DetailState {
+    return this.detailsSubject.value;
+  }
+
+  getUserDetail(id: string): void {
+    this.setState({ ...this.detailsSubject.value, isLoading: true });
+    this.userApi.getUserDetail(id).subscribe(user => {
+        this.setState({ user, isLoading: false });
     });
   }
 
-  getPokemonDetails(id: string): void {
-    this.detailsSubject.next({ user: null, isLoading: true });
-    this.userApi.getUserDetail(id)
-    .subscribe(user => {
-      this.detailsSubject.next({ user, isLoading: false });
+  updateUser(id: string, jsonPatch: Operation[], callback?: Function): void {
+    this.userApi.patchUpdate(id, jsonPatch).subscribe(user => {
+        if(user) {
+            this.setState({ ...this.detailsSubject.value, user });
+            callback && callback();
+        }
     });
   }
 }

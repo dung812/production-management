@@ -1,0 +1,23 @@
+<form nz-form [formGroup]="validateForm">
+    <nz-form-item>
+        <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="email">E-mail</nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="The input is not valid E-mail!">
+            <input nz-input formControlName="email" id="email" />
+        </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+        <nz-form-label
+          [nzSm]="6"
+          [nzXs]="24"
+          nzFor="name"
+          nzRequired
+          nzTooltipTitle="What do you want other to call you"
+        >
+          <span>Name</span>
+        </nz-form-label>
+        <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please input your name!">
+          <input nz-input id="name" formControlName="name" />
+        </nz-form-control>
+    </nz-form-item>
+</form>

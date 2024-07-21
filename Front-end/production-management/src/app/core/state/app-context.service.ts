@@ -20,7 +20,6 @@ export class AppContextService {
   }
 
   setUser(user: SimplifiedCurrentUser | null): void {
-    console.log(user);
     this.userSubject.next(user);
   }
 

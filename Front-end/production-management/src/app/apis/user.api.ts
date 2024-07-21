@@ -4,12 +4,13 @@ import { User, UserForm, UserPaginatedQuery } from "../models/user.model";
 import { BaseApi } from "./base.api";
 import { PaginatedModel, SORT_ORDER_TYPE } from "../models/common.model";
 import { Injectable } from "@angular/core";
-import { SimplifiedUser, UserDetailRes } from "../modules/user/components/detail/models/detail.model";
+import { SimplifiedUser } from "../modules/user/components/detail/models/detail.model";
+import { Operation } from "rfc6902";
 
 @Injectable({
   providedIn: "root",
 })
-export class UserAPI extends BaseApi<User, UserForm> {
+export class UserAPI extends BaseApi<User> {
     constructor(httpClient: HttpClient) {
         super(httpClient);
     }
@@ -32,22 +33,17 @@ export class UserAPI extends BaseApi<User, UserForm> {
         return this.httpClient.get<PaginatedModel<User>>(`${this.BASE_URL}/${this.getResourceUrl()}?${new URLSearchParams(queryObject).toString()}`)
     }
 
-
     getUserDetail(id: string): Observable<SimplifiedUser> {
-        console.log(id);
-        return this.httpClient.get<UserDetailRes>(`${this.BASE_URL}/${this.getResourceUrl()}/${id}`).pipe(
-            delay(1500),
-            map((user: UserDetailRes) => UserAPI.getSimplifiedUser(user))
-        );
+        return this.getById(id, UserAPI.mapToSimplifiedUser);
     }
 
-    private static getSimplifiedUser(user: UserDetailRes | null): SimplifiedUser {
+    private static mapToSimplifiedUser(user: User | null): SimplifiedUser {
         return {
-            name: user?.name || "",
-            id: user?.id || "",
-            userName: user?.userName || "",
-            email: user?.email || "",
-            roles: user?.roles || "",
+          name: user?.name || '',
+          id: user?.id || '',
+          userName: user?.userName || '',
+          email: user?.email || '',
+          roles: user?.roles || '',
         };
-    }
+    }  
 }

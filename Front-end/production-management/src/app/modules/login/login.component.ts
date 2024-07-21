@@ -17,8 +17,8 @@ export class LoginComponent {
     userName: FormControl<string>;
     password: FormControl<string>;
   }> = this.fb.group({
-    userName: ['', [Validators.required]],
-    password: ['', [Validators.required]],
+    userName: ['admin', [Validators.required]],
+    password: ['876543210x@X', [Validators.required]],
   });
   constructor(
     private fb: NonNullableFormBuilder,
