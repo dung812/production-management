@@ -13,7 +13,7 @@ namespace ProductionManagement.ServiceLayer.Interfaces
 		Task<User> GetByUserNameAsync(string userName);
 		PagedList<UserViewContract> GetAllWithPaging(UserQueryCriteria filter);
 		Task<UserViewContract> CreateAsync(User userToCreate, string[] roleNames, string? newPassword);
-		Task<bool> UpdateAsync(User newUser);
+		Task<UserViewContract> UpdateAsync(User newUser);
 		Task<bool> UpdateRoleAsync(User userToUpdate, string[] newRoleNames);
 		Task<bool> DisableAsync(string userId);
 		Task<bool> ChangePasswordAsync(User userToChangePassword, string newPassword, string? currentPassword = null);

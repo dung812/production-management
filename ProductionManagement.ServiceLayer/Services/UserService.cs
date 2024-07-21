@@ -23,26 +23,29 @@ namespace ProductionManagement.ServiceLayer.Services
 			_userManager = userManager;
 		}
 
-		public async Task<UserViewContract> CreateAsync(User userToCreate, string[] roleNames, string? newPassword)
-		{
-			userToCreate.CreatedDate = DateTime.UtcNow;
-			userToCreate.ModifiedDate = DateTime.UtcNow;
+        public async Task<UserViewContract> CreateAsync(User userToCreate, string[] roleNames, string? newPassword)
+        {
+            userToCreate.CreatedDate = DateTime.UtcNow;
+            userToCreate.ModifiedDate = DateTime.UtcNow;
 
-			var createResult = await _userManager.CreateAsync(userToCreate, newPassword ?? DefaultPassword.OtherRole);
-			if (!createResult.Succeeded)
-			{
-				throw new ModifyException(createResult.ToErrorStrings());
-			}
+            var createResult = await _userManager.CreateAsync(userToCreate, newPassword ?? DefaultPassword.OtherRole);
+            if (!createResult.Succeeded)
+            {
+                throw new ModifyException(createResult.ToErrorStrings());
+            }
 
-			var addToRoleResult = await _userManager.AddToRolesAsync(userToCreate, roleNames);
-			if (!addToRoleResult.Succeeded)
-			{
-				throw new ModifyException(addToRoleResult.ToErrorStrings());
-			}
+            var addToRoleResult = await _userManager.AddToRolesAsync(userToCreate, roleNames);
+            if (!addToRoleResult.Succeeded)
+            {
+                throw new ModifyException(addToRoleResult.ToErrorStrings());
+            }
+            var userFound = await GetByIdAsync(userToCreate.Id);
+            var userView = AsView(userFound);
+            userView.Roles = string.Join(Separator.CommaSeparator, await _userManager.GetRolesAsync(userFound));
+            return userView;
+        }
 
-			return AsView(userToCreate);
-		}
-		public PagedList<UserViewContract> GetAllWithPaging(UserQueryCriteria filter)
+        public PagedList<UserViewContract> GetAllWithPaging(UserQueryCriteria filter)
 		{
 			var userQuery = _userManager.Users;
 
@@ -76,21 +79,23 @@ namespace ProductionManagement.ServiceLayer.Services
 			return await _userManager.FindByIdAsync(userId) ?? throw new NotFoundException($"User with the id - {userId} doesn't exist");
 		}
 
-		public async Task<bool> UpdateAsync(User userToUpdate)
-		{
-			userToUpdate.ModifiedDate = DateTime.UtcNow;
+        public async Task<UserViewContract> UpdateAsync(User userToUpdate)
+        {
+            userToUpdate.ModifiedDate = DateTime.UtcNow;
 
-			var updateResult = await _userManager.UpdateAsync(userToUpdate);
+            var updateResult = await _userManager.UpdateAsync(userToUpdate);
 
-			if (!updateResult.Succeeded)
-			{
-				throw new ModifyException(updateResult.ToErrorStrings());
-			}
+            if (!updateResult.Succeeded)
+            {
+                throw new ModifyException(updateResult.ToErrorStrings());
+            }
+            var userFound = await GetByIdAsync(userToUpdate.Id);
+            var userView = AsView(userFound);
+            userView.Roles = string.Join(Separator.CommaSeparator, await _userManager.GetRolesAsync(userFound));
+            return userView;
+        }
 
-			return updateResult.Succeeded;
-		}
-
-		public async Task<bool> UpdateRoleAsync(User userToUpdate, string[] newRoleNames)
+        public async Task<bool> UpdateRoleAsync(User userToUpdate, string[] newRoleNames)
 		{
 			userToUpdate.ModifiedDate = DateTime.UtcNow;
 			var allUserRoles = await _userManager.GetRolesAsync(userToUpdate);

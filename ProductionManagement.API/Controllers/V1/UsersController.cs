@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.JsonPatch;
 using ProductionManagement.API.Extensions;
 using ProductionManagement.DataContract.Common;
 using ProductionManagement.DataContract.User;
@@ -32,15 +33,15 @@ namespace ProductionManagement.API.Controllers.V1
 			return Ok(_userService.GetAllWithPaging(filter));
 		}
 
-		[HttpPost, ProducesResponseType(StatusCodes.Status201Created)]
-		[Authorize(Policy = "Admin")]
-		public async Task<ActionResult<CreatedResponse>> CreateUserAsync([FromBody] UserCreateContract userContract)
-		{
-			var userAdded = await _userService.CreateAsync(userContract.ToNewEntity(), userContract.Roles.SplitAndRemoveBlank(), userContract.NewPassword);
-			return StatusCode(StatusCodes.Status201Created, new CreatedResponse(userAdded.Id));
-		}
+        [HttpPost, ProducesResponseType(StatusCodes.Status201Created)]
+        [Authorize(Policy = "Admin")]
+        public async Task<ActionResult<UserViewContract>> CreateUserAsync([FromBody] UserCreateContract userContract)
+        {
+            var result = await _userService.CreateAsync(userContract.ToNewEntity(), userContract.Roles.SplitAndRemoveBlank(), userContract.NewPassword);
+            return StatusCode(StatusCodes.Status201Created, result);
+        }
 
-		[HttpPut("{id}"), ProducesResponseType(StatusCodes.Status204NoContent)]
+        [HttpPut("{id}"), ProducesResponseType(StatusCodes.Status204NoContent)]
 		public async Task<NoContentResult> PutUserAsync([FromBody] UserUpdateContract userContract, [FromRoute] string id)
 		{
 			var userToUpdate = userContract.UpdateFor(await _userService.GetByIdAsync(id));
@@ -82,7 +83,28 @@ namespace ProductionManagement.API.Controllers.V1
 			return NoContent();
 		}
 
-		private static void EnsureIsValidUser(User user, string id)
+        [HttpPatch("{id}"), ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> PatchUserAsync([FromBody] JsonPatchDocument<User> patch, [FromRoute] string id)
+        {
+            if (patch == null)
+            {
+                return BadRequest("Patch document cannot be null.");
+            }
+
+            var userToUpdate = await _userService.GetByIdAsync(id);
+            if (userToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            patch.ApplyTo(userToUpdate);
+
+            EnsureIsValidUser(userToUpdate, id);
+            var result = await _userService.UpdateAsync(userToUpdate);
+            return StatusCode(StatusCodes.Status200OK, result);
+        }
+
+        private static void EnsureIsValidUser(User user, string id)
 		{
 			if(user.Id != id)
 				throw new ArgumentException("There are some errors when trying to get the requested user");

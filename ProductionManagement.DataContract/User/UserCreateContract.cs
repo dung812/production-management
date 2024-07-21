@@ -6,7 +6,7 @@ namespace ProductionManagement.DataContract.User
 {
 	public class UserCreateContract : CreateContract<Models.User>
 	{
-		public string? Id { get; set; }
+		//public string? Id { get; set; }
 		[MaxLength(255, ErrorMessage = "Name must be less than 255 characters long")]
 		[Required(ErrorMessage = "Name is required", AllowEmptyStrings = false)]
 		public string Name { get; set; } = null!;
