@@ -1,0 +1,52 @@
+<ng-container *ngIf="state$ | async as state">
+    <nz-input-group class="w-1/5 mb-5" [nzSuffix]="suffixIconSearch">
+        <input type="text" nz-input placeholder="Find the user..." [formControl]="searchQuery" />
+    </nz-input-group>
+    <ng-template #suffixIconSearch>
+        <i nz-icon nzType="search"></i>
+    </ng-template>
+
+    <nz-table
+        #basicTable
+        [nzData]="state.users"
+        [nzLoading]="state.isLoading"
+        nzShowSizeChanger
+        [nzFrontPagination]=false
+        [nzScroll]="{ y: '540px' }"
+    >
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>UserName</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let data of basicTable.data">
+                <td><a [routerLink]="['detail', data.id]">{{ data.id }}</a></td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.userName }}</td>
+                <td>{{ data.email }}</td>
+                <td>{{ data.roles }}</td>
+                <td>
+                    <a>Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </nz-table>
+
+    <nz-pagination
+        class="pagination"
+        nzShowSizeChanger
+        nzShowQuickJumper
+        [nzTotal]="state.totalItems"
+        [(nzPageIndex)]="state.currentPage"
+        [(nzPageSize)]="state.pageSize"
+        (nzPageIndexChange)="onPageChanged($event)"
+        (nzPageSizeChange)="onSizeChanged($event)"
+    >
+    </nz-pagination>
+</ng-container>

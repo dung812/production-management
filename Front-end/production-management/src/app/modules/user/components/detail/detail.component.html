@@ -1,0 +1,15 @@
+<ng-container *ngIf="state$ | async as state">
+    <div [ngClass]="{ 'loading-area': state.isLoading }">
+        <nz-spin nzSimple *ngIf="state.isLoading"></nz-spin>
+        <nz-descriptions nzTitle="User Info" nzLayout="vertical">
+            <nz-descriptions-item nzTitle="ID">{{ state.user?.id }}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Name">{{ state.user?.name }}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="UserName">{{
+                state.user?.userName
+            }}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Email">{{ state.user?.email }}</nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Role">{{ state.user?.roles }}</nz-descriptions-item>
+        </nz-descriptions>
+
+    </div>
+</ng-container>
